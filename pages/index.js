@@ -19,34 +19,29 @@ export default function Home() {
 
   const router = useRouter();
   const accessToken = router.query.accessToken;
-  
 
   useEffect(() => {
     if (accessToken) {
       console.log("Token de acesso disponível:", accessToken);
-      setSearchReciveToken(accessToken)
+      setSearchReciveToken(accessToken);
     }
   }, [accessToken]);
 
   const handleSpotifyLogin = () => {
-    const clientId = "00f3230c60b14a2e9cdd4bb680becfb3";
-    const redirectUri = "http://localhost:3000/callback";
+    const clientId = process.env.NEXT_PUBLIC_CLIENTID;
+    const redirectUri = "https://spotify-alegria.vercel.app/callback";
     const scope =
       "playlist-modify-public playlist-modify-private playlist-read-private";
     const authorizationUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&scope=${encodeURIComponent(scope)}`;
 
-    // eslint-disable-next-line
     console.log("URL de Autorização:", authorizationUrl);
-
     window.location.href = authorizationUrl;
   };
 
   const handleSearch = async () => {
-    const accessToken =
-      //"BQDTaN0ATMTSKo5VV2P8tmAq3S03xkorx4r6O-a0tlfaigXS0NhFrxcafGTJkPKfswQWvNSBkkQzV9mD_snkESjNOTuT1SAhrpKVkaJNF2TI7-wuU4zdNbCmXjF_r7b76yJ6_bBz0SOikCpa67egDYTM-rA6JOKnciIKx9zsi2B4K-in2ADJ2Ih_6gUs5GujI1OU3DRYI6Yr9pyHZQQApTYzrfZ9afkX5iu7WepCYJFh-JmhHQSWaUl9-LR2Ew5J5qRClaXSnzxYPQ"
-      searchReciveToken
+    const accessToken = searchReciveToken;
     const apiUrl = "https://api.spotify.com/v1/search";
 
     const queryParams = new URLSearchParams({
