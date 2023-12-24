@@ -8,22 +8,45 @@ import {
   Center,
   Image,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchData, setSearchData] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const [searchReciveToken, setSearchReciveToken] = useState("");
+
+  const router = useRouter();
+  const accessToken = router.query.accessToken;
+  
+
+  useEffect(() => {
+    if (accessToken) {
+      console.log("Token de acesso disponível:", accessToken);
+      setSearchReciveToken(accessToken)
+    }
+  }, [accessToken]);
 
   const handleSpotifyLogin = () => {
-    window.location.href = "/api/getSpotifyToken";
+    const clientId = "00f3230c60b14a2e9cdd4bb680becfb3";
+    const redirectUri = "http://localhost:3000/callback";
+    const scope =
+      "playlist-modify-public playlist-modify-private playlist-read-private";
+    const authorizationUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&scope=${encodeURIComponent(scope)}`;
+
+    // eslint-disable-next-line
+    console.log("URL de Autorização:", authorizationUrl);
+
+    window.location.href = authorizationUrl;
   };
 
   const handleSearch = async () => {
     const accessToken =
-   
-    "BQBQjn-I1rcqXLUgNBHVxst3DqopsR205h5SouaB12TRrCjgrlgOcctBlWi4rwLWQ3BQI6pqlm-nYJtbn2eb83z8HnW75ynTZ8TsGRbEU3FYziYjkKX4mBrFnrI9EqxRzWlaywC-HemOJU_02XlN1mw6bhu6HI8utqB870qfcY5oAs9eIw2qt-7-3Q6UanjnqYHGvjVwYizE_AYi4Zayvjz4ugejeCs2nq17P5BnA1ybEE9jaifydzclWxwghyIVBU-22OCcFtX_1A"
-
+      //"BQDTaN0ATMTSKo5VV2P8tmAq3S03xkorx4r6O-a0tlfaigXS0NhFrxcafGTJkPKfswQWvNSBkkQzV9mD_snkESjNOTuT1SAhrpKVkaJNF2TI7-wuU4zdNbCmXjF_r7b76yJ6_bBz0SOikCpa67egDYTM-rA6JOKnciIKx9zsi2B4K-in2ADJ2Ih_6gUs5GujI1OU3DRYI6Yr9pyHZQQApTYzrfZ9afkX5iu7WepCYJFh-JmhHQSWaUl9-LR2Ew5J5qRClaXSnzxYPQ"
+      searchReciveToken
     const apiUrl = "https://api.spotify.com/v1/search";
 
     const queryParams = new URLSearchParams({
@@ -31,7 +54,7 @@ export default function Home() {
       type: "album",
       market: "BR",
     });
-  
+
     const requestOptions = {
       method: "GET",
       headers: {

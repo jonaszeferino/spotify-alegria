@@ -9,6 +9,8 @@ const CallbackPage = () => {
 
   useEffect(() => {
     const { code } = router.query;
+    console.log("Código recebido:", code);
+
     const exchangeCodeForToken = async () => {
       try {
         console.log("Código recebido:", code);
@@ -17,7 +19,10 @@ const CallbackPage = () => {
         const data = await response.json();
         console.log("Token de acesso recebido:", data.accessToken);
         setAccessToken(data.accessToken);
-        router.push("/");
+        router.push({
+          pathname: "/",
+          query: { accessToken: data.accessToken }
+        });
       } catch (error) {
         console.error("Erro ao trocar código por token:", error);
       } finally {
