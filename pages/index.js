@@ -7,6 +7,7 @@ import {
   ChakraProvider,
   Center,
   Image,
+  Flex,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -14,8 +15,10 @@ import { useRouter } from "next/router";
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchData, setSearchData] = useState(null);
+  const [searchDataAlbuns, setSearchDataAlbuns] = useState(null);
   const [searchError, setSearchError] = useState("");
   const [searchReciveToken, setSearchReciveToken] = useState("");
+  const [artistIdRecive, setArtistIdRecive] = useState("");
 
   const router = useRouter();
   const accessToken = router.query.accessToken;
@@ -72,34 +75,41 @@ export default function Home() {
     }
   };
 
+  const handleImageClick = (artistId) => {
+    console.log("ID do álbum clicado:", artistId);
+    setArtistIdRecive(artistId);
+    handleSearchById();
+  };
+  
 
   const handleSearchById = async () => {
-    const artistId = "2DaxqgrOhkeH0fpeiQq2f4"; // Substitua pelo ID do artista desejado
+    const albumId = artistIdRecive;
+    console.log(albumId);
+
     const country = "BR";
-  
+
     const accessToken = searchReciveToken;
-    const apiUrl = `https://api.spotify.com/v1/artists/${artistId}/top-tracks?country=${country}`;
-  
+    const apiUrl = `https://api.spotify.com/v1/albums/${albumId}/tracks`;
+    console.log(albumId);
+
     const requestOptions = {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     };
-  
+
     try {
       const response = await fetch(apiUrl, requestOptions);
       const data = await response.json();
-  
+
       console.log("Dados da resposta:", data);
-      setSearchData(data);
+      setSearchDataAlbuns({ tracks: data.items });
     } catch (error) {
       console.error("Erro na requisição:", error);
       setSearchError("Erro ao realizar a pesquisa.");
     }
   };
-  
-
 
   return (
     <>
@@ -113,6 +123,9 @@ export default function Home() {
         <Center>
           <Box as="main">
             <Box className="description" />
+            <Center>
+              <Image src="/alegria.jpeg" />
+            </Center>
 
             <Box className="grid">
               <Center>
@@ -120,36 +133,70 @@ export default function Home() {
                   Entrar na Alegria
                 </Button>
               </Center>
+              <br />
               <Box className="searchForm">
-                <Input
-                  type="text"
-                  placeholder="Digite sua pesquisa"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                <Center>
+                  <Input
+                    type="text"
+                    placeholder="Digite sua pesquisa"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    mx="auto" // Adiciona margem à esquerda e à direita automaticamente
+                    width="600px" // Define uma largura fixa para o Input (ajuste conforme necessário)
+                  />
+                </Center>
+
                 <Center>
                   <Button onClick={handleSearch}>Pesquisar</Button>
                 </Center>
-                <Center>
-                  <Button onClick={handleSearchById}>Teste</Button>
-                </Center>
+                <br />
 
                 {searchData && searchData.albums && searchData.albums.items && (
+                  <Flex flexWrap="wrap" justifyContent="space-around">
+                    {searchData.albums.items.map((album) => (
+                      <Box
+                        key={album.id}
+                        m={4}
+                        width="300px"
+                        borderWidth="1px"
+                        borderRadius="lg"
+                        overflow="hidden"
+                      >
+                        <Image
+                          src={album.images[0].url}
+                          alt={album.name}
+                          onClick={() => handleImageClick(album.id)}
+                          cursor="pointer"
+                        />
+
+                        <Box p="6">
+                          <Text fontWeight="bold" fontSize="20px" mb="2">
+                            {album.name}
+                          </Text>
+                          <Text color="gray.500">{album.artists[0].name}</Text>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Flex>
+                )}
+
+                {searchError && <Text color="red.500">{searchError}</Text>}
+                {searchDataAlbuns && searchDataAlbuns.items && (
                   <Box>
-                    <Text>
-                      Nome do álbum: {searchData.albums.items[0].name}
-                    </Text>
-                    <Text>
-                      Artista: {searchData.albums.items[0].artists[0].name}
-                    </Text>
-                    <Image src={searchData.albums.items[0].images[0].url} />
+                    {searchDataAlbuns.items.map((track) => (
+                      <div key={track.id}>
+                        <iframe
+                          src={`https://open.spotify.com/embed/track/${track.id}`}
+                          width="300"
+                          height="380"
+                          allowtransparency="true"
+                          allow="encrypted-media"
+                        ></iframe>
+                        <p>{track.name}</p>
+                      </div>
+                    ))}
                   </Box>
                 )}
-                {searchError && <Text color="red.500">{searchError}</Text>}
-
-
-                <iframe src="https://open.spotify.com/embed/track/5qqabIl2vWzo9ApSC317sa" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-
               </Box>
             </Box>
           </Box>
