@@ -34,8 +34,8 @@ export default function Home() {
 
   const handleSpotifyLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_CLIENTID;
-    //const redirectUri = "https://spotify-alegria.vercel.app/callback";
-    const redirectUri = "http://localhost:3000/callback";
+    const redirectUri = "https://spotify-alegria.vercel.app/callback";
+    //const redirectUri = "http://localhost:3000/callback";
     const scope =
       "playlist-modify-public playlist-modify-private playlist-read-private";
     const authorizationUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
