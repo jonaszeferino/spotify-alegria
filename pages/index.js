@@ -19,6 +19,8 @@ export default function Home() {
   const [searchError, setSearchError] = useState("");
   const [searchReciveToken, setSearchReciveToken] = useState("");
   const [artistIdRecive, setArtistIdRecive] = useState("");
+  const [colorSelect, setColorSelect] = useState(false);
+  const [selectedCardId, setSelectedCardId] = useState(null);
 
   const router = useRouter();
   const accessToken = router.query.accessToken;
@@ -75,22 +77,28 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    if (artistIdRecive) {
+      handleSearchById();
+    }
+  }, [artistIdRecive, searchReciveToken]);
+
   const handleImageClick = (artistId) => {
-    console.log("ID do álbum clicado:", artistId);
     setArtistIdRecive(artistId);
-    handleSearchById();
+    setSelectedCardId(artistId);
+    
   };
-  
 
   const handleSearchById = async () => {
+    console.log("Chamou handleSearchById");
     const albumId = artistIdRecive;
-    console.log(albumId);
+    console.log("Album ID:", albumId);
 
     const country = "BR";
 
     const accessToken = searchReciveToken;
     const apiUrl = `https://api.spotify.com/v1/albums/${albumId}/tracks`;
-    console.log(albumId);
+    console.log("API URL:", apiUrl);
 
     const requestOptions = {
       method: "GET",
@@ -104,11 +112,15 @@ export default function Home() {
       const data = await response.json();
 
       console.log("Dados da resposta:", data);
-      setSearchDataAlbuns({ tracks: data.items });
+      setSearchDataAlbuns(data);
     } catch (error) {
       console.error("Erro na requisição:", error);
       setSearchError("Erro ao realizar a pesquisa.");
     }
+  };
+
+  const handleCardColor = () => {
+    setColorSelect(true);
   };
 
   return (
@@ -161,6 +173,7 @@ export default function Home() {
                         borderWidth="1px"
                         borderRadius="lg"
                         overflow="hidden"
+                        bg={selectedCardId === album.id ? "green" : "white"} // Adicionado aqui
                       >
                         <Image
                           src={album.images[0].url}
@@ -181,22 +194,26 @@ export default function Home() {
                 )}
 
                 {searchError && <Text color="red.500">{searchError}</Text>}
-                {searchDataAlbuns && searchDataAlbuns.items && (
-                  <Box>
-                    {searchDataAlbuns.items.map((track) => (
-                      <div key={track.id}>
-                        <iframe
-                          src={`https://open.spotify.com/embed/track/${track.id}`}
-                          width="300"
-                          height="380"
-                          allowtransparency="true"
-                          allow="encrypted-media"
-                        ></iframe>
-                        <p>{track.name}</p>
-                      </div>
-                    ))}
-                  </Box>
-                )}
+                {searchDataAlbuns &&
+                  searchDataAlbuns.items &&
+                  searchDataAlbuns.items.length > 0 && (
+                    <Flex flexWrap="wrap" justifyContent="space-around">
+                      <Box>
+                        {searchDataAlbuns.items.map((track) => (
+                          <div key={track.id}>
+                            <iframe
+                              src={`https://open.spotify.com/embed/track/${track.id}`}
+                              width="300"
+                              height="380"
+                              allowtransparency="true"
+                              allow="encrypted-media"
+                            ></iframe>
+                            <p>{track.name}</p>
+                          </div>
+                        ))}
+                      </Box>
+                    </Flex>
+                  )}
               </Box>
             </Box>
           </Box>
