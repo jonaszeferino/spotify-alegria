@@ -86,7 +86,6 @@ export default function Home() {
   const handleImageClick = (artistId) => {
     setArtistIdRecive(artistId);
     setSelectedCardId(artistId);
-    
   };
 
   const handleSearchById = async () => {
@@ -198,20 +197,18 @@ export default function Home() {
                   searchDataAlbuns.items &&
                   searchDataAlbuns.items.length > 0 && (
                     <Flex flexWrap="wrap" justifyContent="space-around">
-                      <Box>
-                        {searchDataAlbuns.items.map((track) => (
-                          <div key={track.id}>
-                            <iframe
-                              src={`https://open.spotify.com/embed/track/${track.id}`}
-                              width="300"
-                              height="380"
-                              allowtransparency="true"
-                              allow="encrypted-media"
-                            ></iframe>
-                            <p>{track.name}</p>
-                          </div>
-                        ))}
-                      </Box>
+                      {searchDataAlbuns.items.map((track) => (
+                        <Box key={track.id} m={4}>
+                          <iframe
+                            src={`https://open.spotify.com/embed/track/${track.id}`}
+                            width="300"
+                            height="380"
+                            allowtransparency="true"
+                            allow="encrypted-media"
+                          ></iframe>
+                          <p>{track.name}</p>
+                        </Box>
+                      ))}
                     </Flex>
                   )}
               </Box>
