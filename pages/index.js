@@ -8,7 +8,8 @@ import {
   Center,
   Image,
   Flex,
-  useToast
+  useToast,
+  Heading
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -204,9 +205,12 @@ export default function Home() {
                 )}
 
                 {searchError && <Text color="red.500">{searchError}</Text>}
+
                 {searchDataAlbuns &&
                   searchDataAlbuns.items &&
                   searchDataAlbuns.items.length > 0 && (
+
+                    <Heading> Músicas
                     <Flex flexWrap="wrap" justifyContent="space-around">
                       {searchDataAlbuns.items.map((track) => (
                         <Box key={track.id} m={4}>
@@ -223,6 +227,7 @@ export default function Home() {
                         </Box>
                       ))}
                     </Flex>
+                    </Heading>
                   )}
               </Box>
             </Box>
