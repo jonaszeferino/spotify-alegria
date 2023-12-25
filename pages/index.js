@@ -8,6 +8,7 @@ import {
   Center,
   Image,
   Flex,
+  useToast
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -22,6 +23,7 @@ export default function Home() {
   const [colorSelect, setColorSelect] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState(null);
 
+  const toast = useToast(); // Inicialize o hook useToast
   const router = useRouter();
   const accessToken = router.query.accessToken;
 
@@ -120,6 +122,15 @@ export default function Home() {
 
   const handleCardColor = () => {
     setColorSelect(true);
+  };
+
+  const showMusicToast = () => {
+    toast({
+      title: "Verifique as músicas abaixo!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   return (
