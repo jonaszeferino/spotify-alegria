@@ -206,7 +206,9 @@ export default function Home() {
                             allowtransparency="true"
                             allow="encrypted-media"
                           ></iframe>
-                          <p>{track.name}</p>
+                          <Box maxWidth="300px">
+                            <p>{track.name}</p>
+                          </Box>
                         </Box>
                       ))}
                     </Flex>
