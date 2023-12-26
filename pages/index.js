@@ -9,9 +9,9 @@ import {
   Image,
   Flex,
   useToast,
-  Heading
+  Heading,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 
 export default function Home() {
@@ -24,9 +24,10 @@ export default function Home() {
   const [colorSelect, setColorSelect] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState(null);
 
-  const toast = useToast(); // Inicialize o hook useToast
+  const toast = useToast();
   const router = useRouter();
   const accessToken = router.query.accessToken;
+  const down = useRef(null);
 
   useEffect(() => {
     if (accessToken) {
@@ -37,8 +38,8 @@ export default function Home() {
 
   const handleSpotifyLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_CLIENTID;
-    const redirectUri = "https://spotify-alegria.vercel.app/callback";
     //const redirectUri = "http://localhost:3000/callback";
+    const redirectUri = "http://localhost:3000/callback";
     const scope =
       "playlist-modify-public playlist-modify-private playlist-read-private";
     const authorizationUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
@@ -65,7 +66,6 @@ export default function Home() {
         Authorization: `Bearer ${accessToken}`,
       },
     };
-
     const finalUrl = `${apiUrl}?${queryParams.toString()}`;
 
     try {
@@ -96,12 +96,8 @@ export default function Home() {
     const albumId = artistIdRecive;
     console.log("Album ID:", albumId);
 
-    const country = "BR";
-
     const accessToken = searchReciveToken;
     const apiUrl = `https://api.spotify.com/v1/albums/${albumId}/tracks`;
-    console.log("API URL:", apiUrl);
-
     const requestOptions = {
       method: "GET",
       headers: {
@@ -112,7 +108,6 @@ export default function Home() {
     try {
       const response = await fetch(apiUrl, requestOptions);
       const data = await response.json();
-
       console.log("Dados da resposta:", data);
       setSearchDataAlbuns(data);
     } catch (error) {
@@ -205,12 +200,15 @@ export default function Home() {
                 )}
 
                 {searchError && <Text color="red.500">{searchError}</Text>}
+                {searchDataAlbuns && (
+                  <Center>
+                    <Heading ref={down}> Músicas</Heading>
+                  </Center>
+                )}
 
                 {searchDataAlbuns &&
                   searchDataAlbuns.items &&
                   searchDataAlbuns.items.length > 0 && (
-
-                    <Heading> Músicas
                     <Flex flexWrap="wrap" justifyContent="space-around">
                       {searchDataAlbuns.items.map((track) => (
                         <Box key={track.id} m={4}>
@@ -227,7 +225,6 @@ export default function Home() {
                         </Box>
                       ))}
                     </Flex>
-                    </Heading>
                   )}
               </Box>
             </Box>
