@@ -81,9 +81,7 @@ export default function PasswordResetPage() {
             </Button>
           </Center>
 
-          <Center>
-            <Image src="/alegria.jpeg" />
-          </Center>
+      
           <br />
           {alertMessage && (
             <ChakraProvider>
@@ -96,6 +94,10 @@ export default function PasswordResetPage() {
             </ChakraProvider>
           )}
           <br />
+
+          <Center>
+            <Image src="/alegria.jpeg" />
+          </Center>
 
           <Divider my={4} />
 
