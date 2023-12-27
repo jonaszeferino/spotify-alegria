@@ -161,7 +161,9 @@ export default function Auth() {
           maxW="400px"
           width="100%"
           position="relative"
-          marginTop={5}
+          marginTop={10}
+          margin={5}
+
         >
           <Heading as="h1" size="xl" textAlign="center" mb={4}>
             {isSignUp ? "Cadastre-se" : "Login"}

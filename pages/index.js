@@ -44,7 +44,7 @@ export default function Home() {
 
   useEffect(() => {
     if (accessToken) {
-     setSearchReciveToken(accessToken);
+      setSearchReciveToken(accessToken);
       setLoginStartTime(new Date());
     }
   }, [accessToken]);
@@ -53,7 +53,7 @@ export default function Home() {
     const clientId = process.env.NEXT_PUBLIC_CLIENTID;
     //const redirectUri = "http://localhost:3000/callback";
     const redirectUri = "https://spotify-alegria.vercel.app/callback";
-    
+
     const scope =
       "playlist-modify-public playlist-modify-private playlist-read-private";
     const authorizationUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
@@ -221,8 +221,9 @@ export default function Home() {
                       placeholder="Digite sua pesquisa"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      mx="auto" // Adiciona margem à esquerda e à direita automaticamente
-                      width="600px" // Define uma largura fixa para o Input (ajuste conforme necessário)
+                      mx="auto"
+                      maxWidth="80%"
+                      margin={{ base: "10px", md: "10px" }}
                     />
                   </Center>
 
