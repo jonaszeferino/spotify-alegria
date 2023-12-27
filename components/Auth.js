@@ -15,6 +15,7 @@ import {
   Divider,
   InputGroup,
   InputRightElement,
+  Image,
 } from "@chakra-ui/react";
 import { FaGoogle, FaEyeSlash, FaEye } from "react-icons/fa";
 
@@ -153,7 +154,7 @@ export default function Auth() {
           </Center>
         </ChakraProvider>
       </>
-      <Center height="60vh">
+      <Center height="80vh">
         <Box
           p={2}
           borderWidth="1px"
@@ -165,6 +166,7 @@ export default function Auth() {
           <Heading as="h1" size="xl" textAlign="center" mb={4}>
             {isSignUp ? "Cadastre-se" : "Login"}
           </Heading>
+
           <FormControl>
             <FormLabel>Email</FormLabel>
             <Input
@@ -202,16 +204,6 @@ export default function Auth() {
           </Link>
 
           <Center>
-            {isSignUp && (
-              <Button
-                mt={4}
-                colorScheme="teal"
-                size="md"
-                onClick={handleSignUp}
-              >
-                Cadastre-Se
-              </Button>
-            )}
             {!isSignUp && (
               <Button
                 mt={4}
@@ -222,40 +214,10 @@ export default function Auth() {
                 Login
               </Button>
             )}
+            <br />
           </Center>
-          <br />
-          {alertMessage && (
-            <ChakraProvider>
-              <Alert status="info">
-                <AlertIcon />
-                {alertMessage === "Email not confirmed"
-                  ? "E-mail Não Confirmado"
-                  : alertMessage}
-              </Alert>
-            </ChakraProvider>
-          )}
-          <br />
-
-          {/* Link para alternar entre Sign In e Sign Up */}
-          <Divider my={4} />
           <Center>
-            <Button
-              mt={4}
-              colorScheme="blue"
-              size="md"
-              leftIcon={<FaGoogle />} // Adicione o ícone do Google aqui
-              onClick={handleGoogleSignIn}
-            >
-              Login com Google
-            </Button>
-          </Center>
-          <br />
-          <Center>
-            <Link onClick={changeForm} cursor="pointer">
-              {isSignUp
-                ? "Você já tem uma Conta? Faça o Login!"
-                : "Você é Novo? Cadastre-se!"}
-            </Link>
+            <Image src="/alegria.jpeg" />
           </Center>
         </Box>
       </Center>

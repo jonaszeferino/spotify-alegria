@@ -13,6 +13,9 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
+import { supabase } from "../utils/supabaseClient";
+import LoggedUser from "../components/LoggedUser";
+import Auth from "../components/Auth";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +26,9 @@ export default function Home() {
   const [artistIdRecive, setArtistIdRecive] = useState("");
   const [colorSelect, setColorSelect] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const [session, setSession] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [Email_user, setEmail_user] = useState(null);
 
   const toast = useToast();
   const router = useRouter();
@@ -120,14 +126,32 @@ export default function Home() {
     setColorSelect(true);
   };
 
-  const showMusicToast = () => {
-    toast({
-      title: "Verifique as músicas abaixo!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
+  //session verify
+
+  useEffect(() => {
+    let mounted = true;
+    async function getInitialSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (mounted) {
+        if (session) {
+          setSession(session);
+        }
+        setIsLoading(false);
+      }
+    }
+    getInitialSession();
+    const { subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
+    return () => {
+      mounted = false;
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   return (
     <>
@@ -137,100 +161,113 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ChakraProvider>
-        <Center>
-          <Box as="main">
-            <Box className="description" />
-            <Center>
-              <Image src="/alegria.jpeg" />
-            </Center>
 
-            <Box className="grid">
+      <Center>
+        <LoggedUser />
+      </Center>
+
+      {session ? (
+        <ChakraProvider>
+          <Center>
+            <Box as="main">
+              <Box className="description" />
               <Center>
-                <Button onClick={handleSpotifyLogin} className="card">
-                  Entrar na Alegria
-                </Button>
+                <Image src="/alegria.jpeg" />
               </Center>
-              <br />
-              <Box className="searchForm">
-                <Center>
-                  <Input
-                    type="text"
-                    placeholder="Digite sua pesquisa"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    mx="auto" // Adiciona margem à esquerda e à direita automaticamente
-                    width="600px" // Define uma largura fixa para o Input (ajuste conforme necessário)
-                  />
-                </Center>
 
+              <Box className="grid">
                 <Center>
-                  <Button onClick={handleSearch}>Pesquisar</Button>
+                  <Button onClick={handleSpotifyLogin} className="card">
+                    Entrar na Alegria
+                  </Button>
                 </Center>
                 <br />
-
-                {searchData && searchData.albums && searchData.albums.items && (
-                  <Flex flexWrap="wrap" justifyContent="space-around">
-                    {searchData.albums.items.map((album) => (
-                      <Box
-                        key={album.id}
-                        m={4}
-                        width="300px"
-                        borderWidth="1px"
-                        borderRadius="lg"
-                        overflow="hidden"
-                        bg={selectedCardId === album.id ? "green" : "white"} // Adicionado aqui
-                      >
-                        <Image
-                          src={album.images[0].url}
-                          alt={album.name}
-                          onClick={() => handleImageClick(album.id)}
-                          cursor="pointer"
-                        />
-
-                        <Box p="6">
-                          <Text fontWeight="bold" fontSize="20px" mb="2">
-                            {album.name}
-                          </Text>
-                          <Text color="gray.500">{album.artists[0].name}</Text>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Flex>
-                )}
-
-                {searchError && <Text color="red.500">{searchError}</Text>}
-                {searchDataAlbuns && (
+                <Box className="searchForm">
                   <Center>
-                    <Heading ref={down}> Músicas</Heading>
+                    <Input
+                      type="text"
+                      placeholder="Digite sua pesquisa"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      mx="auto" // Adiciona margem à esquerda e à direita automaticamente
+                      width="600px" // Define uma largura fixa para o Input (ajuste conforme necessário)
+                    />
                   </Center>
-                )}
 
-                {searchDataAlbuns &&
-                  searchDataAlbuns.items &&
-                  searchDataAlbuns.items.length > 0 && (
-                    <Flex flexWrap="wrap" justifyContent="space-around">
-                      {searchDataAlbuns.items.map((track) => (
-                        <Box key={track.id} m={4}>
-                          <iframe
-                            src={`https://open.spotify.com/embed/track/${track.id}`}
-                            width="300"
-                            height="380"
-                            allowtransparency="true"
-                            allow="encrypted-media"
-                          ></iframe>
-                          <Box maxWidth="300px">
-                            <p>{track.name}</p>
+                  <Center>
+                    <Button onClick={handleSearch}>Pesquisar</Button>
+                  </Center>
+                  <br />
+
+                  {searchData &&
+                    searchData.albums &&
+                    searchData.albums.items && (
+                      <Flex flexWrap="wrap" justifyContent="space-around">
+                        {searchData.albums.items.map((album) => (
+                          <Box
+                            key={album.id}
+                            m={4}
+                            width="300px"
+                            borderWidth="1px"
+                            borderRadius="lg"
+                            overflow="hidden"
+                            bg={selectedCardId === album.id ? "green" : "white"} // Adicionado aqui
+                          >
+                            <Image
+                              src={album.images[0].url}
+                              alt={album.name}
+                              onClick={() => handleImageClick(album.id)}
+                              cursor="pointer"
+                            />
+
+                            <Box p="6">
+                              <Text fontWeight="bold" fontSize="20px" mb="2">
+                                {album.name}
+                              </Text>
+                              <Text color="gray.500">
+                                {album.artists[0].name}
+                              </Text>
+                            </Box>
                           </Box>
-                        </Box>
-                      ))}
-                    </Flex>
+                        ))}
+                      </Flex>
+                    )}
+
+                  {searchError && <Text color="red.500">{searchError}</Text>}
+                  {searchDataAlbuns && (
+                    <Center>
+                      <Heading ref={down}> Músicas</Heading>
+                    </Center>
                   )}
+
+                  {searchDataAlbuns &&
+                    searchDataAlbuns.items &&
+                    searchDataAlbuns.items.length > 0 && (
+                      <Flex flexWrap="wrap" justifyContent="space-around">
+                        {searchDataAlbuns.items.map((track) => (
+                          <Box key={track.id} m={4}>
+                            <iframe
+                              src={`https://open.spotify.com/embed/track/${track.id}`}
+                              width="300"
+                              height="380"
+                              allowtransparency="true"
+                              allow="encrypted-media"
+                            ></iframe>
+                            <Box maxWidth="300px">
+                              <p>{track.name}</p>
+                            </Box>
+                          </Box>
+                        ))}
+                      </Flex>
+                    )}
+                </Box>
               </Box>
             </Box>
-          </Box>
-        </Center>
-      </ChakraProvider>
+          </Center>
+        </ChakraProvider>
+      ) : (
+        <Auth />
+      )}
     </>
   );
 }
