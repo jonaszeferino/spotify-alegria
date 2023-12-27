@@ -10,12 +10,17 @@ import {
   Flex,
   useToast,
   Heading,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/supabaseClient";
 import LoggedUser from "../components/LoggedUser";
 import Auth from "../components/Auth";
+import { format } from "date-fns";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,6 +34,8 @@ export default function Home() {
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [Email_user, setEmail_user] = useState(null);
+  const [loginStartTime, setLoginStartTime] = useState(null);
+  const [message, setMessage] = useState(false);
 
   const toast = useToast();
   const router = useRouter();
@@ -37,52 +44,56 @@ export default function Home() {
 
   useEffect(() => {
     if (accessToken) {
-      console.log("Token de acesso disponível:", accessToken);
-      setSearchReciveToken(accessToken);
+     setSearchReciveToken(accessToken);
+      setLoginStartTime(new Date());
     }
   }, [accessToken]);
 
   const handleSpotifyLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_CLIENTID;
-    //const redirectUri = "http://localhost:3000/callback";
     const redirectUri = "http://localhost:3000/callback";
     const scope =
       "playlist-modify-public playlist-modify-private playlist-read-private";
     const authorizationUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&scope=${encodeURIComponent(scope)}`;
-
     console.log("URL de Autorização:", authorizationUrl);
     window.location.href = authorizationUrl;
   };
 
   const handleSearch = async () => {
     const accessToken = searchReciveToken;
-    const apiUrl = "https://api.spotify.com/v1/search";
+    if (
+      loginStartTime &&
+      Date.now() - loginStartTime.getTime() > 59 * 60 * 1000
+    ) {
+      handleSpotifyLogin();
+      setMessage(true);
+    } else {
+      const apiUrl = "https://api.spotify.com/v1/search";
 
-    const queryParams = new URLSearchParams({
-      q: searchQuery,
-      type: "album",
-      market: "BR",
-    });
+      const queryParams = new URLSearchParams({
+        q: searchQuery,
+        type: "album",
+        market: "BR",
+      });
 
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
-    const finalUrl = `${apiUrl}?${queryParams.toString()}`;
-
-    try {
-      const response = await fetch(finalUrl, requestOptions);
-      const data = await response.json();
-
-      console.log("Dados da resposta:", data);
-      setSearchData(data);
-    } catch (error) {
-      console.error("Erro na requisição:", error);
-      setSearchError("Erro ao realizar a pesquisa.");
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
+      const finalUrl = `${apiUrl}?${queryParams.toString()}`;
+      try {
+        const response = await fetch(finalUrl, requestOptions);
+        const data = await response.json();
+        console.log("Dados da resposta:", data);
+        setSearchData(data);
+      } catch (error) {
+        console.error("Erro na requisição:", error);
+        setSearchError("Erro ao realizar a pesquisa.");
+      }
     }
   };
 
@@ -98,9 +109,7 @@ export default function Home() {
   };
 
   const handleSearchById = async () => {
-    console.log("Chamou handleSearchById");
     const albumId = artistIdRecive;
-    console.log("Album ID:", albumId);
 
     const accessToken = searchReciveToken;
     const apiUrl = `https://api.spotify.com/v1/albums/${albumId}/tracks`;
@@ -153,6 +162,12 @@ export default function Home() {
     };
   }, []);
 
+  const handleNotSession = () => {
+    if (!session) {
+      setLoginStartTime(null);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -166,6 +181,14 @@ export default function Home() {
         <LoggedUser />
       </Center>
 
+      {message === true ? (
+        <Center>
+          <Heading>
+            A senha Expirou - Quando voltar Digite o termo novamente
+          </Heading>
+        </Center>
+      ) : null}
+
       {session ? (
         <ChakraProvider>
           <Center>
@@ -173,6 +196,13 @@ export default function Home() {
               <Box className="description" />
               <Center>
                 <Image src="/alegria.jpeg" />
+              </Center>
+              <Center>
+                <p>
+                  Data de login:{" "}
+                  {loginStartTime &&
+                    format(loginStartTime, "HH:mm:ss dd/MM/yyyy")}
+                </p>
               </Center>
 
               <Box className="grid">
