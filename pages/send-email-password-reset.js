@@ -28,7 +28,8 @@ export default function PasswordResetPage() {
     setAlertMessage("");
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "https://spotify-alegria.vercel.app/send-email-password-reset",
+        redirectTo:
+          "https://spotify-alegria.vercel.app/send-email-password-reset",
       });
       if (error) {
         throw error;
@@ -77,6 +78,10 @@ export default function PasswordResetPage() {
             >
               Send a Link
             </Button>
+          </Center>
+
+          <Center>
+            <Image src="/alegria.jpeg" />
           </Center>
           <br />
           {alertMessage && (
