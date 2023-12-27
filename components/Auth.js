@@ -200,7 +200,7 @@ export default function Auth() {
 
           <Link
             color="teal.500"
-            href="https://supabase-nextjs-gamma.vercel.app/send-email-password-reset"
+            href="https://spotify-alegria.vercel.app/send-email-password-reset"
           >
             Esqueci minha senha
           </Link>
