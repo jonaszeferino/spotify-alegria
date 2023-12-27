@@ -95,15 +95,16 @@ export default function PasswordResetPage() {
           )}
           <br />
 
-          <Center>
-            <Image src="/alegria.jpeg" />
-          </Center>
-
+        
           <Divider my={4} />
 
           <br />
         </Box>
       </Center>
+      <Center>
+            <Image src="/alegria.jpeg" />
+          </Center>
+
     </ChakraProvider>
   );
 }
