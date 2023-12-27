@@ -15,6 +15,7 @@ import {
   Divider,
   InputGroup,
   InputRightElement,
+  Image
 } from "@chakra-ui/react";
 import Head from "next/head";
 
